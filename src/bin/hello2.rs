@@ -6,7 +6,7 @@
 
 #[no_mangle]
 fn main() -> i32 {
-    let s = "Hello World from user mode program!\n";
+    let s = "Hello World from user mode program, AGAIN!\n";
     user_lib::sys_write(1, s.as_bytes());
     0
 }
