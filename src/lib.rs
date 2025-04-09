@@ -2,13 +2,16 @@
 
 #![no_std]
 #![no_main]
+#![feature(linkage)]
 
 mod lang_items;
 mod syscall;
 
+pub use syscall::*;
+
 /// Clear the BSS segment
 fn clear_bss() {
-    unsafe extern "C" {
+    extern "C" {
         fn sbss();
         fn ebss();
     }
@@ -17,12 +20,18 @@ fn clear_bss() {
     });
 }
 
-#[unsafe(no_mangle)]
-#[unsafe(link_section = ".text.entry")]
+#[no_mangle]
+#[link_section = ".text.entry"]
 /// The user program
 pub extern "C" fn _start() {
     clear_bss();
-    let s = "Hello, world!\n";
-    crate::syscall::sys_write(1, s.as_bytes());
-    crate::syscall::sys_exit(9);
+    syscall::sys_exit(main());
+}
+
+#[linkage = "weak"]
+#[no_mangle]
+fn main() -> i32 {
+    let s = "Cannot find main!\n";
+    syscall::sys_write(1, s.as_bytes());
+    9
 }
